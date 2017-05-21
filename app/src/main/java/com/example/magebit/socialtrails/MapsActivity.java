@@ -14,6 +14,8 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.app.Activity;
 import android.util.Log;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -44,6 +46,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     LocationManager locationManager;
     ArrayList markerPoints = new ArrayList();
+    TextView _outputRoute;
+    DBHandler dbHandler;
+    String startMarker;
+    String finishMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +60,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(map);
         mapFragment.getMapAsync(this);
 
+
+        _outputRoute = (TextView) findViewById(R.id._outputRoute);
+        dbHandler = new DBHandler(this, null, null, 1);
+        printDatabase();
 
         //Set current location marker
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -78,7 +88,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     .title(str)
                                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.current))
                             );
-                            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng), 16);
+                            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -146,6 +156,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     }
+    public void _addRoute() {
+
+        /*Route route = new Route(_outputRoute.getText().toString());*/
+    }
+
+    public void printDatabase() {
+        String dbString = dbHandler.databaseToString();
+        _outputRoute.setText(dbString);
+    }
 
 
     /**
@@ -186,6 +205,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 // Add the new marker
                 mMap.addMarker(options);
+
                 if(markerPoints.size() >= 2) {
                     //Get first click location, starting point
                     LatLng origin = (LatLng) markerPoints.get(0);
