@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.app.Activity;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -39,6 +40,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.example.magebit.socialtrails.R.id._inputRoute;
 import static com.example.magebit.socialtrails.R.id.map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -47,9 +49,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     LocationManager locationManager;
     ArrayList markerPoints = new ArrayList();
     TextView _outputRoute;
+    EditText _inputRoute;
     DBHandler dbHandler;
-    String startMarker;
-    String finishMarker;
+    Double startMarkerLat;
+    Double startMarkerLng;
+    Double finishMarkerLat;
+    Double finishMarkerLng;
+    boolean isRoute;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +69,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         _outputRoute = (TextView) findViewById(R.id._outputRoute);
         dbHandler = new DBHandler(this, null, null, 1);
-        printDatabase();
+        /*printDatabase();*/
 
         //Set current location marker
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -156,15 +162,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     }
-    public void _addRoute() {
+    public void _addRoute(View view) {
 
-        /*Route route = new Route(_outputRoute.getText().toString());*/
+        if (isRoute) {
+            Route route = new Route(_inputRoute.getText().toString(), startMarkerLat, startMarkerLng, finishMarkerLat, finishMarkerLng);
+            dbHandler.addRoute(route);
+            /*printDatabase();*/
+        }
     }
 
-    public void printDatabase() {
+/*    public void printDatabase() {
         String dbString = dbHandler.databaseToString();
-        _outputRoute.setText(dbString);
-    }
+        if (dbString != null) {
+            _outputRoute.setText(dbString);
+            _inputRoute.setText("");
+
+        }
+    }*/
 
 
     /**
@@ -198,9 +212,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 options.position(latLng);
 
                 if(markerPoints.size() == 1) {
+                    startMarkerLat = latLng.latitude;
+                    startMarkerLng = latLng.longitude;
                     options.icon(BitmapDescriptorFactory.fromResource(R.drawable.start));
                 }
                 else if (markerPoints.size() == 2) {
+                    finishMarkerLat = latLng.latitude;
+                    finishMarkerLng = latLng.longitude;
+                    isRoute = true;
                     options.icon(BitmapDescriptorFactory.fromResource(R.drawable.flag));
                 }
                 // Add the new marker
@@ -226,17 +245,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         //Adding show current location functionality
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
         }
-        mMap.setMyLocationEnabled(true);
 
         //Testing Polyline
         mMap.addPolyline(new PolylineOptions().geodesic(true)

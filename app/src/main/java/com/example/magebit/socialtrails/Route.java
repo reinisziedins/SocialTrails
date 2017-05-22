@@ -9,22 +9,23 @@ import com.google.android.gms.maps.model.LatLng;
 public class Route {
     int _id;
     String _name;
-    Float _startLat;
-    Float _startLng;
-    Float _finishLat;
-    Float _finishLng;
+    Double _startLat;
+    Double _startLng;
+    Double _finishLat;
+    Double _finishLng;
 
     public Route() {
 
     }
 
-    public Route(String _name, Float _startLat, Float _startLng, Float _finishLat, Float _finishLng) {
+    public Route(String _name, Double _startLat, Double _startLng, Double _finishLat, Double _finishLng) {
         this._name = _name;
         this._startLat = _startLat;
         this._startLng = _startLng;
         this._finishLat = _finishLat;
         this._finishLng = _finishLng;
     }
+
 
     public int get_id() {
         return _id;
@@ -34,19 +35,19 @@ public class Route {
         return _name;
     }
 
-    public Float get_startLat() {
+    public Double get_startLat() {
         return _startLat;
     }
 
-    public Float get_startLng() {
+    public Double get_startLng() {
         return _startLng;
     }
 
-    public Float get_finishLat() {
+    public Double get_finishLat() {
         return _finishLat;
     }
 
-    public Float get_finishLng() {
+    public Double get_finishLng() {
         return _finishLng;
     }
 
@@ -58,19 +59,19 @@ public class Route {
         this._name = _name;
     }
 
-    public void set_startLat(Float _startLat) {
+    public void set_startLat(Double _startLat) {
         this._startLat = _startLat;
     }
 
-    public void set_startLng(Float _startLng) {
+    public void set_startLng(Double _startLng) {
         this._startLng = _startLng;
     }
 
-    public void set_finishLat(Float _finishLat) {
+    public void set_finishLat(Double _finishLat) {
         this._finishLat = _finishLat;
     }
 
-    public void set_finishLng(Float _finishLng) {
+    public void set_finishLng(Double _finishLng) {
         this._finishLng = _finishLng;
     }
 }

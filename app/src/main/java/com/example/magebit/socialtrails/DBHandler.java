@@ -27,10 +27,10 @@ public class DBHandler extends SQLiteOpenHelper {
         String query = "CREATE TABLE " + TABLE_ROUTES +  "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT " +
                 COLUMN_ROUTENAME + " TEXT " +
-                COLUMN_STARTLAT + " FLOAT(16) " +
-                COLUMN_STARTLNG + " FLOAT(16) " +
-                COLUMN_FINISHLAT + " FLOAT(16) " +
-                COLUMN_FINISHLNG + " FLOAT(16) " +
+                COLUMN_STARTLAT + "double " +
+                COLUMN_STARTLNG + " double " +
+                COLUMN_FINISHLAT + " double " +
+                COLUMN_FINISHLNG + " double " +
                 ");";
         db.execSQL(query);
     }
@@ -73,6 +73,7 @@ public class DBHandler extends SQLiteOpenHelper {
                 dbString += c.getString(c.getColumnIndex("routename"));
                 dbString += "\n";
             }
+            c.moveToNext();
         }
         db.close();
         return dbString;
