@@ -66,10 +66,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(map);
         mapFragment.getMapAsync(this);
 
-
+        _inputRoute = (EditText) findViewById(R.id._inputRoute);
         _outputRoute = (TextView) findViewById(R.id._outputRoute);
         dbHandler = new DBHandler(this, null, null, 1);
-        /*printDatabase();*/
+        printDatabase();
 
         //Set current location marker
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -162,23 +162,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     }
+    //Add route to database
     public void _addRoute(View view) {
 
         if (isRoute) {
             Route route = new Route(_inputRoute.getText().toString(), startMarkerLat, startMarkerLng, finishMarkerLat, finishMarkerLng);
             dbHandler.addRoute(route);
-            /*printDatabase();*/
+            printDatabase();
         }
     }
 
-/*    public void printDatabase() {
+    public void printDatabase() {
         String dbString = dbHandler.databaseToString();
         if (dbString != null) {
             _outputRoute.setText(dbString);
             _inputRoute.setText("");
 
         }
-    }*/
+    }
 
 
     /**

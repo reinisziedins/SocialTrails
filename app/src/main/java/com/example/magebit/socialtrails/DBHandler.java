@@ -25,12 +25,12 @@ public class DBHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String query = "CREATE TABLE " + TABLE_ROUTES +  "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT " +
-                COLUMN_ROUTENAME + " TEXT " +
-                COLUMN_STARTLAT + "double " +
-                COLUMN_STARTLNG + " double " +
-                COLUMN_FINISHLAT + " double " +
-                COLUMN_FINISHLNG + " double " +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                COLUMN_ROUTENAME + " TEXT, " +
+                COLUMN_STARTLAT + " double, " +
+                COLUMN_STARTLNG + " double, " +
+                COLUMN_FINISHLAT + " double, " +
+                COLUMN_FINISHLNG + " doubledada" +
                 ");";
         db.execSQL(query);
     }
@@ -62,15 +62,17 @@ public class DBHandler extends SQLiteOpenHelper {
     public String databaseToString() {
         String dbString = "";
         SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT " + COLUMN_ROUTENAME + " FROM " + TABLE_ROUTES + " WHERE 1";
+        String query = "SELECT " + COLUMN_ROUTENAME + ", " + COLUMN_STARTLAT + " FROM " + TABLE_ROUTES + " WHERE 1";
 
         Cursor c = db.rawQuery(query, null);
 
         c.moveToFirst();
 
         while(!c.isAfterLast()) {
-            if(c.getString(c.getColumnIndex("routename"))!= null) {
-                dbString += c.getString(c.getColumnIndex("routename"));
+            if(c.getString(c.getColumnIndex(COLUMN_ROUTENAME))!= null) {
+                dbString += c.getString(c.getColumnIndex(COLUMN_ROUTENAME));
+                dbString += ",";
+                dbString += c.getString(c.getColumnIndex(COLUMN_STARTLAT));
                 dbString += "\n";
             }
             c.moveToNext();
