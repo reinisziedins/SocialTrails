@@ -38,10 +38,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import static com.example.magebit.socialtrails.R.id.map;
+import static com.example.magebit.socialtrails.R.id.wide;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -71,52 +73,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         _inputRoute = (EditText) findViewById(R.id.inputRouteField);
         _outputRoute = (TextView) findViewById(R.id.outputRouteField);
         dbHandler = new DBHandler(this, null, null, 1);
-        printDatabase();
 
 
 
 
 
-    }
-    //Add route to database
-    public void _addRoute(View view) {
-
-        if (isRoute) {
-            Route route = new Route(_inputRoute.getText().toString(), startMarkerLat, startMarkerLng, finishMarkerLat, finishMarkerLng);
-            dbHandler.addRoute(route);
-            _createTrail(view);
-            printDatabase();
-
-        }
-    }
-    //Enter/Cancel create a trail mode
-    public void _createTrail(View view) {
-        Button createTrailButton = (Button)findViewById(R.id.createTrailButton);
-        if (isPlacing) {
-            isPlacing = false;
-            createTrailButton.setText("Create Trail");
-            if (markerPoints.size() > 1) {
-                markerPoints.clear();
-                mMap.clear();
-            }
-
-        }
-        else  {
-            isPlacing = true;
-            createTrailButton.setText("Cancel");
-        }
 
     }
 
-
-    public void printDatabase() {
-        String dbString = dbHandler.databaseToString();
-        if (dbString != null) {
-            _outputRoute.setText(dbString);
-            _inputRoute.setText("");
-
-        }
-    }
 
 
 
@@ -126,6 +90,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        printDatabase();
       /*  LatLng Riga = new LatLng(56, 24);
         mMap.addMarker(new MarkerOptions().position(Riga).title("Ziediņa markers"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(Riga));*/
@@ -229,7 +194,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     //Clearing markers
                     if (markerPoints.size() > 1) {
                         markerPoints.clear();
-                        mMap.clear();
+                       // mMap.clear();
                     }
 
                     markerPoints.add(latLng);
@@ -279,6 +244,63 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
+    }
+    //Add route to database
+    public void _addRoute(View view) {
+        if (isRoute) {
+            Route route = new Route(_inputRoute.getText().toString(), startMarkerLat, startMarkerLng, finishMarkerLat, finishMarkerLng);
+            dbHandler.addRoute(route);
+            _createTrail(view);
+            printDatabase();
+
+        }
+    }
+    //Enter/Cancel create a trail mode
+    public void _createTrail(View view) {
+        Button createTrailButton = (Button)findViewById(R.id.createTrailButton);
+        if (isPlacing) {
+            isPlacing = false;
+            createTrailButton.setText("Create Trail");
+            if (markerPoints.size() > 1) {
+                markerPoints.clear();
+             /*   mMap.clear();*/
+            }
+
+        }
+        else  {
+            isPlacing = true;
+            createTrailButton.setText("Cancel");
+        }
+
+    }
+
+
+    public void printDatabase() {
+        String dbString = dbHandler.databaseToString();
+        double[] latListStart = dbHandler.getLatStart();
+        double[] lngListStart = dbHandler.getLngStart();
+        double[] latListFinish = dbHandler.getLatFinish();
+        double[] lngListFinish = dbHandler.getLngFinish();
+        int i = dbHandler.getIterator();
+        i--;
+        int j = 0;
+        while (i >= 0) {
+            LatLng origin = new LatLng(latListStart[j], lngListStart[j]);
+            LatLng dest = new LatLng(latListFinish[j], lngListFinish[j]);
+
+            String url = getDirectionsUrl(origin, dest);
+
+            DownloadTask downloadTask = new DownloadTask();
+
+            downloadTask.execute(url);
+            j++;
+            i--;
+        }
+        if (dbString != null) {
+            _outputRoute.setText(Arrays.toString(latListStart));
+            _inputRoute.setText("");
+
+        }
     }
     private class DownloadTask extends AsyncTask<String, Void, String> {
 
@@ -349,14 +371,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     double lat = Double.parseDouble(point.get("lat"));
                     double lng = Double.parseDouble(point.get("lng"));
                     LatLng position = new LatLng(lat, lng);
-
+                    if (j == 0 || j == (path.size() - 1)){
+                        MarkerOptions options = new MarkerOptions();
+                        options.position(position);
+                        if (j == 0 ) {
+                            options.icon(BitmapDescriptorFactory.fromResource(R.drawable.start));
+                        }
+                        else {
+                            options.icon(BitmapDescriptorFactory.fromResource(R.drawable.flag));
+                        }
+                        mMap.addMarker(options);
+                    }
                     points.add(position);
                 }
 
                 lineOptions.addAll(points);
                 lineOptions.width(12);
-                lineOptions.color(Color.RED);
+                lineOptions.color(Color.BLUE);
                 lineOptions.geodesic(true);
+
+                HashMap<String, String> point = path.get(i);
+                double lat = Double.parseDouble(point.get("lat"));
+                double lng = Double.parseDouble(point.get("lng"));
+                LatLng position = new LatLng(lat, lng);
 
             }
 
