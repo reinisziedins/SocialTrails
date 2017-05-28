@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Button;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -40,7 +41,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.example.magebit.socialtrails.R.id._inputRoute;
 import static com.example.magebit.socialtrails.R.id.map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -56,6 +56,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Double finishMarkerLat;
     Double finishMarkerLng;
     boolean isRoute;
+    boolean isPlacing;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,10 +68,69 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(map);
         mapFragment.getMapAsync(this);
 
-        _inputRoute = (EditText) findViewById(R.id._inputRoute);
-        _outputRoute = (TextView) findViewById(R.id._outputRoute);
+        _inputRoute = (EditText) findViewById(R.id.inputRouteField);
+        _outputRoute = (TextView) findViewById(R.id.outputRouteField);
         dbHandler = new DBHandler(this, null, null, 1);
         printDatabase();
+
+
+
+
+
+    }
+    //Add route to database
+    public void _addRoute(View view) {
+
+        if (isRoute) {
+            Route route = new Route(_inputRoute.getText().toString(), startMarkerLat, startMarkerLng, finishMarkerLat, finishMarkerLng);
+            dbHandler.addRoute(route);
+            _createTrail(view);
+            printDatabase();
+
+        }
+    }
+    //Enter/Cancel create a trail mode
+    public void _createTrail(View view) {
+        Button createTrailButton = (Button)findViewById(R.id.createTrailButton);
+        if (isPlacing) {
+            isPlacing = false;
+            createTrailButton.setText("Create Trail");
+            if (markerPoints.size() > 1) {
+                markerPoints.clear();
+                mMap.clear();
+            }
+
+        }
+        else  {
+            isPlacing = true;
+            createTrailButton.setText("Cancel");
+        }
+
+    }
+
+
+    public void printDatabase() {
+        String dbString = dbHandler.databaseToString();
+        if (dbString != null) {
+            _outputRoute.setText(dbString);
+            _inputRoute.setText("");
+
+        }
+    }
+
+
+
+    /**
+     * Manipulates the map once available.
+     */
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+      /*  LatLng Riga = new LatLng(56, 24);
+        mMap.addMarker(new MarkerOptions().position(Riga).title("Ziediņa markers"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(Riga));*/
+
+
 
         //Set current location marker
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -159,83 +220,48 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 });
             }
         }
-
-
-    }
-    //Add route to database
-    public void _addRoute(View view) {
-
-        if (isRoute) {
-            Route route = new Route(_inputRoute.getText().toString(), startMarkerLat, startMarkerLng, finishMarkerLat, finishMarkerLng);
-            dbHandler.addRoute(route);
-            printDatabase();
-        }
-    }
-
-    public void printDatabase() {
-        String dbString = dbHandler.databaseToString();
-        if (dbString != null) {
-            _outputRoute.setText(dbString);
-            _inputRoute.setText("");
-
-        }
-    }
-
-
-    /**
-     * Manipulates the map once available.
-     */
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-      /*  LatLng Riga = new LatLng(56, 24);
-        mMap.addMarker(new MarkerOptions().position(Riga).title("Ziediņa markers"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(Riga));*/
-
-
-
-
         // Placing route marker functionality
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
+                if (isPlacing) {
 
-                //Clearing markers
-                if (markerPoints.size() > 1) {
-                    markerPoints.clear();
-                    mMap.clear();
-                }
+                    //Clearing markers
+                    if (markerPoints.size() > 1) {
+                        markerPoints.clear();
+                        mMap.clear();
+                    }
 
-                markerPoints.add(latLng);
+                    markerPoints.add(latLng);
 
-                MarkerOptions options = new MarkerOptions();
+                    MarkerOptions options = new MarkerOptions();
 
-                options.position(latLng);
+                    options.position(latLng);
 
-                if(markerPoints.size() == 1) {
-                    startMarkerLat = latLng.latitude;
-                    startMarkerLng = latLng.longitude;
-                    options.icon(BitmapDescriptorFactory.fromResource(R.drawable.start));
-                }
-                else if (markerPoints.size() == 2) {
-                    finishMarkerLat = latLng.latitude;
-                    finishMarkerLng = latLng.longitude;
-                    isRoute = true;
-                    options.icon(BitmapDescriptorFactory.fromResource(R.drawable.flag));
-                }
-                // Add the new marker
-                mMap.addMarker(options);
+                    if (markerPoints.size() == 1) {
+                        startMarkerLat = latLng.latitude;
+                        startMarkerLng = latLng.longitude;
+                        options.icon(BitmapDescriptorFactory.fromResource(R.drawable.start));
+                    } else if (markerPoints.size() == 2) {
+                        finishMarkerLat = latLng.latitude;
+                        finishMarkerLng = latLng.longitude;
+                        isRoute = true;
+                        options.icon(BitmapDescriptorFactory.fromResource(R.drawable.flag));
+                    }
+                    // Add the new marker
+                    mMap.addMarker(options);
 
-                if(markerPoints.size() >= 2) {
-                    //Get first click location, starting point
-                    LatLng origin = (LatLng) markerPoints.get(0);
-                    LatLng dest = (LatLng) markerPoints.get(1);
+                    if (markerPoints.size() >= 2) {
+                        //Get first click location, starting point
+                        LatLng origin = (LatLng) markerPoints.get(0);
+                        LatLng dest = (LatLng) markerPoints.get(1);
 
-                    String url = getDirectionsUrl(origin, dest);
+                        String url = getDirectionsUrl(origin, dest);
 
-                    DownloadTask downloadTask = new DownloadTask();
+                        DownloadTask downloadTask = new DownloadTask();
 
-                    downloadTask.execute(url);
+                        downloadTask.execute(url);
+                    }
                 }
             }
         });
@@ -250,13 +276,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.setMyLocationEnabled(true);
         }
 
-        //Testing Polyline
-        mMap.addPolyline(new PolylineOptions().geodesic(true)
-                .add(new LatLng(-33.866, 151.195))  // Sydney
-                .add(new LatLng(-18.142, 178.431))  // Fiji
-                .add(new LatLng(21.291, -157.821))  // Hawaii
-                .add(new LatLng(37.423, -122.091))  // Mountain View
-        );
+
 
 
     }
@@ -340,7 +360,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
 
-// Drawing polyline in the Google Map for the i-th route
+        // Drawing polyline(route) in the Google Map for the i-th route
             mMap.addPolyline(lineOptions);
         }
     }

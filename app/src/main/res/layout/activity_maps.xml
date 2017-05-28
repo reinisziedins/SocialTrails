@@ -13,7 +13,7 @@
         tools:context="com.example.magebit.socialtrails.MapsActivity" />
 
     <Button
-        android:id="@+id/_addRoute"
+        android:id="@+id/addRouteButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
@@ -21,22 +21,42 @@
         android:onClick="_addRoute"
         android:text="Add Route" />
 
+
     <TextView
-        android:id="@+id/_outputRoute"
+        android:id="@+id/outputRouteField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:filterTouchesWhenObscured="false"
+        android:text="TextView" />
 
     <EditText
-        android:id="@+id/_inputRoute"
+        android:id="@+id/inputRouteField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/_addRoute"
-        android:layout_toEndOf="@+id/_addRoute"
+        android:layout_alignBottom="@+id/addRouteButton"
+        android:layout_toEndOf="@+id/addRouteButton"
         android:ems="10"
         android:inputType="textPersonName" />
+
+    <Button
+        android:id="@+id/createTrailButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="_createTrail"
+        android:text="Create trail"
+        android:layout_below="@+id/addRouteButton"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/outputRouteField"
+        android:layout_alignParentStart="true"
+        android:text="Menu" />
+
 
 </RelativeLayout>
