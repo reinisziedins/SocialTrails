@@ -14,7 +14,7 @@ public class Splash extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
 
-        int secondsDelayed = 1;
+        int secondsDelayed = 2;
         new Handler().postDelayed(new Runnable() {
             public void run() {
                 startActivity(new Intent(Splash.this, MapsActivity.class));

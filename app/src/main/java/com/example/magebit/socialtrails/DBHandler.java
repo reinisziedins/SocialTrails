@@ -22,6 +22,7 @@ public class DBHandler extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, factory, DATABASE_VERSION);
     }
 
+    //Creates the route table
     @Override
     public void onCreate(SQLiteDatabase db) {
         String query = "CREATE TABLE " + TABLE_ROUTES +  "(" +
@@ -30,7 +31,7 @@ public class DBHandler extends SQLiteOpenHelper {
                 COLUMN_STARTLAT + " double, " +
                 COLUMN_STARTLNG + " double, " +
                 COLUMN_FINISHLAT + " double, " +
-                COLUMN_FINISHLNG + " doubledada" +
+                COLUMN_FINISHLNG + " double" +
                 ");";
         db.execSQL(query);
     }
@@ -41,6 +42,7 @@ public class DBHandler extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    //Function to add routes to DB
     public void addRoute(Route route) {
         ContentValues values = new ContentValues();
         values.put(COLUMN_ROUTENAME, route.get_name());
@@ -80,6 +82,8 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
         return dbString;
     }
+
+    //Functions to get coordinates from DB
     public double[] getLatStart() {
 
         SQLiteDatabase db = getWritableDatabase();

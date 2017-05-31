@@ -1,6 +1,7 @@
 package com.example.magebit.socialtrails;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
@@ -274,15 +275,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-
+    //Outputs all routes on map
     public void printDatabase() {
         String dbString = dbHandler.databaseToString();
         double[] latListStart = dbHandler.getLatStart();
         double[] lngListStart = dbHandler.getLngStart();
         double[] latListFinish = dbHandler.getLatFinish();
         double[] lngListFinish = dbHandler.getLngFinish();
-        int i = dbHandler.getIterator();
-        i--;
+        int i = dbHandler.getIterator() - 1;
         int j = 0;
         while (i >= 0) {
             LatLng origin = new LatLng(latListStart[j], lngListStart[j]);
@@ -301,6 +301,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             _inputRoute.setText("");
 
         }
+    }
+    public void addMenu(View v) {
+            startActivity(new Intent(MapsActivity.this, AddRouteActivity.class));
     }
     private class DownloadTask extends AsyncTask<String, Void, String> {
 
@@ -330,12 +333,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    /**
-     * A class to parse the Google Places in JSON format
-     */
+
     private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
 
-        // Parsing the data in non-ui thread
+
         @Override
         protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
 
@@ -397,7 +398,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
 
-        // Drawing polyline(route) in the Google Map for the i-th route
+        // Drawing polyline(route)
             mMap.addPolyline(lineOptions);
         }
     }
