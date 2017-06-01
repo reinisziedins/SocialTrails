@@ -29,6 +29,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -97,8 +98,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         FiletMenuActivity.filterParameter = 0;
 
         //Camera move for demostraction , Note to self: remove when location request is fixed
-        LatLng Riga = new LatLng(56, 24);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(Riga));
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(new LatLng(56.9496, 24.1052)).zoom(10).build();
+        mMap.animateCamera(CameraUpdateFactory
+                .newCameraPosition(cameraPosition));
 
         //Set current location marker
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);

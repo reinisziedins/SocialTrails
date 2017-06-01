@@ -79,6 +79,8 @@ public class DBHandler extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM " + TABLE_ROUTES + " WHERE " + COLUMN_ROUTENAME + "=\"" + routeName + "\";");
 
     }
+
+    //Gets trails
     public Route[] getRoute(int parameter) {
         int year = MapsActivity.currentY;
         int month = MapsActivity.currentM;
@@ -133,11 +135,18 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
         return routes;
     }
-
+    // Gets all info of trails
     public String databaseToString() {
         String dbString = "";
         SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT * FROM " + TABLE_ROUTES + " WHERE 1";
+        String query = "SELECT * FROM " + TABLE_ROUTES +
+                " WHERE 1 + ORDER BY "+
+                COLUMN_YEAR + " , "  +
+                COLUMN_MONTH + " , " +
+                COLUMN_DAY + " , " +
+                COLUMN_HOUR + " , " +
+                COLUMN_MINUTE + " , " +
+                "ASC;";
 
         Cursor c = db.rawQuery(query, null);
 
@@ -167,157 +176,6 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
         return dbString;
     }
-
-    //Functions to get coordinates from DB
-    public double[] getLatStart() {
-
-        SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT " + COLUMN_STARTLAT + " FROM " + TABLE_ROUTES + " WHERE 1";
-
-        Cursor c = db.rawQuery(query, null);
-
-        c.moveToFirst();
-        int i = 0;
-        while(!c.isAfterLast()) {
-            i++;
-            c.moveToNext();
-        }
-        double[] List = new double[i];
-        c.moveToFirst();
-        int j = 0;
-        while(!c.isAfterLast()) {
-            if(c.getString(c.getColumnIndex(COLUMN_STARTLAT))!= null) {
-                List[j] = c.getDouble(c.getColumnIndex(COLUMN_STARTLAT));
-            }
-            j++;
-            c.moveToNext();
-        }
-        db.close();
-        return List;
-    }
-    public double[] getLngStart() {
-
-        SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT " + COLUMN_STARTLNG + " FROM " + TABLE_ROUTES + " WHERE 1";
-
-        Cursor c = db.rawQuery(query, null);
-
-        c.moveToFirst();
-        int i = 0;
-        while(!c.isAfterLast()) {
-            i++;
-            c.moveToNext();
-        }
-        double[] List = new double[i];
-        c.moveToFirst();
-        int j = 0;
-        while(!c.isAfterLast()) {
-            if(c.getString(c.getColumnIndex(COLUMN_STARTLNG))!= null) {
-                List[j] = c.getDouble(c.getColumnIndex(COLUMN_STARTLNG));
-            }
-            j++;
-            c.moveToNext();
-        }
-        db.close();
-        return List;
-    }
-    public double[] getLatFinish() {
-
-        SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT " + COLUMN_FINISHLAT + " FROM " + TABLE_ROUTES + " WHERE 1";
-
-        Cursor c = db.rawQuery(query, null);
-
-        c.moveToFirst();
-        int i = 0;
-        while(!c.isAfterLast()) {
-            i++;
-            c.moveToNext();
-        }
-        double[] List = new double[i];
-        c.moveToFirst();
-        int j = 0;
-        while(!c.isAfterLast()) {
-            if(c.getString(c.getColumnIndex(COLUMN_FINISHLAT))!= null) {
-                List[j] = c.getDouble(c.getColumnIndex(COLUMN_FINISHLAT));
-            }
-            j++;
-            c.moveToNext();
-        }
-        db.close();
-        return List;
-    }
-    public double[] getLngFinish() {
-
-        SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT " + COLUMN_FINISHLNG + " FROM " + TABLE_ROUTES + " WHERE 1";
-
-        Cursor c = db.rawQuery(query, null);
-
-        c.moveToFirst();
-        int i = 0;
-        while(!c.isAfterLast()) {
-            i++;
-            c.moveToNext();
-        }
-        double[] List = new double[i];
-        c.moveToFirst();
-        int j = 0;
-        while(!c.isAfterLast()) {
-            if(c.getString(c.getColumnIndex(COLUMN_FINISHLNG))!= null) {
-                List[j] = c.getDouble(c.getColumnIndex(COLUMN_FINISHLNG));
-            }
-            j++;
-            c.moveToNext();
-        }
-        db.close();
-        return List;
-    }
-    public int getIterator() {
-
-        SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT * FROM " + TABLE_ROUTES + " WHERE 1";
-
-        Cursor c = db.rawQuery(query, null);
-
-        c.moveToFirst();
-        int i = 0;
-        while(!c.isAfterLast()) {
-            i++;
-            c.moveToNext();
-        }
-
-        db.close();
-        return i;
-    }
-    public Object[] getTrails() {
-
-        SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT * FROM " + TABLE_ROUTES + " WHERE 1";
-
-        Cursor c = db.rawQuery(query, null);
-
-        c.moveToFirst();
-        int i = 0;
-        while(!c.isAfterLast()) {
-            i++;
-            c.moveToNext();
-        }
-        Object[] List = new Object[i];
-        c.moveToFirst();
-        int j = 0;
-        while(!c.isAfterLast()) {
-            if(c.getString(c.getColumnIndex(COLUMN_ROUTENAME))!= null) {
-                List[j] = c.getDouble(c.getColumnIndex(COLUMN_FINISHLNG));
-            }
-            j++;
-            c.moveToNext();
-        }
-        db.close();
-        return List;
-    }
-
-
 
 
 }
