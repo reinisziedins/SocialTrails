@@ -140,13 +140,13 @@ public class DBHandler extends SQLiteOpenHelper {
         String dbString = "";
         SQLiteDatabase db = getWritableDatabase();
         String query = "SELECT * FROM " + TABLE_ROUTES +
-                " WHERE 1 + ORDER BY "+
-                COLUMN_YEAR + " , "  +
-                COLUMN_MONTH + " , " +
-                COLUMN_DAY + " , " +
-                COLUMN_HOUR + " , " +
-                COLUMN_MINUTE + " , " +
-                "ASC;";
+                " WHERE 1 ORDER BY " +
+                COLUMN_YEAR + ", "  +
+                COLUMN_MONTH + ", " +
+                COLUMN_DAY + ", " +
+                COLUMN_HOUR + ", " +
+                COLUMN_MINUTE  +
+                " ASC";
 
         Cursor c = db.rawQuery(query, null);
 
