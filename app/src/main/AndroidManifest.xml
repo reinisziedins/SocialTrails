@@ -55,7 +55,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AddRouteActivity"></activity>
+        <activity android:name=".AddRouteActivity" />
+        <activity android:name=".RouteListActivity" />
+        <activity android:name=".FiletMenuActivity"></activity>
     </application>
 
 </manifest>

@@ -48,17 +48,17 @@ import static com.example.magebit.socialtrails.R.id.wide;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    private GoogleMap mMap;
+    private static GoogleMap mMap;
     LocationManager locationManager;
     ArrayList markerPoints = new ArrayList();
     TextView _outputRoute;
     EditText _inputRoute;
-    DBHandler dbHandler;
-    Double startMarkerLat;
-    Double startMarkerLng;
-    Double finishMarkerLat;
-    Double finishMarkerLng;
-    boolean isRoute;
+    static DBHandler dbHandler;
+    static Double startMarkerLat;
+    static Double startMarkerLng;
+    static Double finishMarkerLat;
+    static Double finishMarkerLng;
+    static boolean isRoute;
     boolean isPlacing;
 
 
@@ -71,7 +71,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(map);
         mapFragment.getMapAsync(this);
 
-        _inputRoute = (EditText) findViewById(R.id.inputRouteField);
         _outputRoute = (TextView) findViewById(R.id.outputRouteField);
         dbHandler = new DBHandler(this, null, null, 1);
 
@@ -212,6 +211,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         finishMarkerLat = latLng.latitude;
                         finishMarkerLng = latLng.longitude;
                         isRoute = true;
+                        Button button =(Button)findViewById(R.id.addMenu);
+                        button.setVisibility(View.VISIBLE);
+
+
                         options.icon(BitmapDescriptorFactory.fromResource(R.drawable.flag));
                     }
                     // Add the new marker
@@ -249,7 +252,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //Add route to database
     public void _addRoute(View view) {
         if (isRoute) {
-            Route route = new Route(_inputRoute.getText().toString(), startMarkerLat, startMarkerLng, finishMarkerLat, finishMarkerLng);
+            Route route = new Route(_inputRoute.getText().toString(), startMarkerLat, startMarkerLng, finishMarkerLat, finishMarkerLng, null, 0, 0, 0, 0, 0);
             dbHandler.addRoute(route);
             _createTrail(view);
             printDatabase();
@@ -276,7 +279,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     //Outputs all routes on map
-    public void printDatabase() {
+    public static void printDatabase() {
         String dbString = dbHandler.databaseToString();
         double[] latListStart = dbHandler.getLatStart();
         double[] lngListStart = dbHandler.getLngStart();
@@ -296,16 +299,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             j++;
             i--;
         }
-        if (dbString != null) {
+    /*    if (dbString != null) {
             _outputRoute.setText(Arrays.toString(latListStart));
             _inputRoute.setText("");
 
-        }
+        }*/
     }
+    // Move to add menu activity
     public void addMenu(View v) {
             startActivity(new Intent(MapsActivity.this, AddRouteActivity.class));
     }
-    private class DownloadTask extends AsyncTask<String, Void, String> {
+    //Move to Route list activity
+    public void RouteListView(View v) {
+        startActivity(new Intent(MapsActivity.this, RouteListActivity.class));
+    }
+    //Move to filter menu activity
+    public void FilterMenu(View v) {
+        startActivity(new Intent(MapsActivity.this, FiletMenuActivity.class));
+    }
+    private static class DownloadTask extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... url) {
@@ -334,7 +346,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
-    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+    private static class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
 
 
         @Override
@@ -403,7 +415,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private String getDirectionsUrl(LatLng origin, LatLng dest) {
+    private static String getDirectionsUrl(LatLng origin, LatLng dest) {
 
         // Origin of route
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
@@ -430,7 +442,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     /**
      * A method to download json data from url
      */
-    private String downloadUrl(String strUrl) throws IOException {
+    private static String downloadUrl(String strUrl) throws IOException {
         String data = "";
         InputStream iStream = null;
         HttpURLConnection urlConnection = null;

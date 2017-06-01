@@ -17,12 +17,19 @@ public class DBHandler extends SQLiteOpenHelper {
     public static final String COLUMN_STARTLNG = "startlng";
     public static final String COLUMN_FINISHLAT = "finishlat";
     public static final String COLUMN_FINISHLNG = "finishlng";
+    public static final String COLUMN_DESCRIPTION = "description";
+    public static final String COLUMN_MINUTE = "minute";
+    public static final String COLUMN_HOUR = "hour";
+    public static final String COLUMN_DAY = "day";
+    public static final String COLUMN_MONTH = "month";
+    public static final String COLUMN_YEAR = "year";
+
 
     public DBHandler(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, DATABASE_NAME, factory, DATABASE_VERSION);
     }
 
-    //Creates the route table
+    //Creates the route table (Note to self: remember to keep a look out for commas)
     @Override
     public void onCreate(SQLiteDatabase db) {
         String query = "CREATE TABLE " + TABLE_ROUTES +  "(" +
@@ -31,7 +38,13 @@ public class DBHandler extends SQLiteOpenHelper {
                 COLUMN_STARTLAT + " double, " +
                 COLUMN_STARTLNG + " double, " +
                 COLUMN_FINISHLAT + " double, " +
-                COLUMN_FINISHLNG + " double" +
+                COLUMN_FINISHLNG + " double," +
+                COLUMN_DESCRIPTION + " TEXT," +
+                COLUMN_MINUTE + " INT," +
+                COLUMN_HOUR + " INT," +
+                COLUMN_DAY + " INT," +
+                COLUMN_MONTH + " INT," +
+                COLUMN_YEAR + " INT" +
                 ");";
         db.execSQL(query);
     }
@@ -50,6 +63,12 @@ public class DBHandler extends SQLiteOpenHelper {
         values.put(COLUMN_STARTLNG, route.get_startLng());
         values.put(COLUMN_FINISHLAT, route.get_finishLat());
         values.put(COLUMN_FINISHLNG, route.get_finishLng());
+        values.put(COLUMN_DESCRIPTION, route.get_description());
+        values.put(COLUMN_MINUTE, route.getMinute_x());
+        values.put(COLUMN_HOUR, route.getHour_x());
+        values.put(COLUMN_DAY, route.getDay_x());
+        values.put(COLUMN_MONTH, route.getMonth_x());
+        values.put(COLUMN_YEAR, route.getYear_x());
         SQLiteDatabase db = getWritableDatabase();
         db.insert(TABLE_ROUTES, null, values);
         db.close();

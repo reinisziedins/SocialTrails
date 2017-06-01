@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -21,6 +22,9 @@ public class AddRouteActivity extends AppCompatActivity {
     int year_x,month_x,day_x,hour_x,minute_x, currentY, currentM, currentD;
     static final int DATEDILOG_ID = 0;
     static final int TIMEDILOG_ID = 1;
+    DBHandler dbHandler;
+    EditText routeName;
+    EditText routeDescription;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -33,6 +37,9 @@ public class AddRouteActivity extends AppCompatActivity {
         month_x = currentM = cal.get(Calendar.MONTH);
         day_x = currentD = cal.get(Calendar.DAY_OF_MONTH);
         showDialogOnClick();
+        routeName = (EditText) findViewById(R.id.RouteName);
+        routeDescription = (EditText) findViewById(R.id.RouteDescription);
+        dbHandler = MapsActivity.dbHandler;
     }
     public void toMap(View v) {
         startActivity(new Intent(AddRouteActivity.this, MapsActivity.class));
@@ -90,6 +97,26 @@ public class AddRouteActivity extends AppCompatActivity {
             Toast.makeText(AddRouteActivity.this, hour_x + ":" + minute_x, Toast.LENGTH_LONG).show();
         }
     };
+    public void addRoute(View view) {
+        if (MapsActivity.isRoute) {
+            Route route = new Route(routeName.getText().toString(),
+                    MapsActivity.startMarkerLat,
+                    MapsActivity.startMarkerLng,
+                    MapsActivity.finishMarkerLat,
+                    MapsActivity.finishMarkerLng,
+                    routeDescription.getText().toString(),
+                    minute_x,
+                    hour_x,
+                    day_x,
+                    month_x,
+                    year_x
+                    );
+            dbHandler.addRoute(route);
+            startActivity(new Intent(AddRouteActivity.this, MapsActivity.class));
+
+        }
+    }
+
 
 
 }
