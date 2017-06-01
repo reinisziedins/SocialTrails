@@ -79,11 +79,65 @@ public class DBHandler extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM " + TABLE_ROUTES + " WHERE " + COLUMN_ROUTENAME + "=\"" + routeName + "\";");
 
     }
+    public Route[] getRoute(int parameter) {
+        int year = MapsActivity.currentY;
+        int month = MapsActivity.currentM;
+        int day = MapsActivity.currentD;
+        String query = "SELECT * FROM " + TABLE_ROUTES + " WHERE 1;";
+        if (parameter == 1) {
+             query = "SELECT * FROM " + TABLE_ROUTES + " WHERE " + COLUMN_YEAR + " = " + year +
+                    " AND " + COLUMN_MONTH + " = " + month + " AND " +  COLUMN_DAY + " = " + day + ";";
+        }
+        else if (parameter == 2) {
+            int maxDay = day+7;
+             query = "SELECT * FROM " + TABLE_ROUTES + " WHERE " + COLUMN_YEAR + " = " + year +
+                    " AND " + COLUMN_MONTH + " = " + month + " AND " +  COLUMN_DAY + " <= " + maxDay +
+                     " AND " + COLUMN_DAY + " >= " + day + ";";
+        }
+        else if (parameter == 3) {
+            int maxMonth = month+1;
+            query = "SELECT * FROM " + TABLE_ROUTES + " WHERE " + COLUMN_YEAR + " = " + year +
+                    " AND " + COLUMN_MONTH + " >= " + month +   " AND " + COLUMN_MONTH + " <= " + maxMonth +  ";";
+        }
+
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor c = db.rawQuery(query, null);
+        c.moveToFirst();
+        int i = 0;
+        while(!c.isAfterLast()) {
+            i++;
+            c.moveToNext();
+        }
+        Route[] routes = new Route[i];
+        c.moveToFirst();
+        int j = 0;
+        while(!c.isAfterLast()) {
+            if(c.getString(c.getColumnIndex(COLUMN_STARTLAT))!= null) {
+                 routes[j] = new Route();
+                routes[j].set_id(c.getInt(c.getColumnIndex(COLUMN_ID)));
+                routes[j].set_name(c.getString(c.getColumnIndex(COLUMN_ROUTENAME)));
+                routes[j].set_startLat(c.getDouble(c.getColumnIndex(COLUMN_STARTLAT)));
+                routes[j].set_startLng(c.getDouble(c.getColumnIndex(COLUMN_STARTLNG)));
+                routes[j].set_finishLat(c.getDouble(c.getColumnIndex(COLUMN_FINISHLAT)));
+                routes[j].set_finishLng(c.getDouble(c.getColumnIndex(COLUMN_FINISHLNG)));
+                routes[j].set_description(c.getString(c.getColumnIndex(COLUMN_DESCRIPTION)));
+                routes[j].setMinute_x(c.getInt(c.getColumnIndex(COLUMN_MINUTE)));
+                routes[j].setHour_x(c.getInt(c.getColumnIndex(COLUMN_HOUR)));
+                routes[j].setDay_x(c.getInt(c.getColumnIndex(COLUMN_DAY)));
+                routes[j].setMonth_x(c.getInt(c.getColumnIndex(COLUMN_MONTH)));
+                routes[j].setYear_x(c.getInt(c.getColumnIndex(COLUMN_YEAR)));
+            }
+            j++;
+            c.moveToNext();
+        }
+        db.close();
+        return routes;
+    }
 
     public String databaseToString() {
         String dbString = "";
         SQLiteDatabase db = getWritableDatabase();
-        String query = "SELECT " + COLUMN_ROUTENAME + ", " + COLUMN_STARTLAT + " FROM " + TABLE_ROUTES + " WHERE 1";
+        String query = "SELECT * FROM " + TABLE_ROUTES + " WHERE 1";
 
         Cursor c = db.rawQuery(query, null);
 
@@ -91,9 +145,21 @@ public class DBHandler extends SQLiteOpenHelper {
 
         while(!c.isAfterLast()) {
             if(c.getString(c.getColumnIndex(COLUMN_ROUTENAME))!= null) {
+                dbString += c.getString(c.getColumnIndex(COLUMN_ID));
+                dbString += ". ";
                 dbString += c.getString(c.getColumnIndex(COLUMN_ROUTENAME));
-                dbString += ",";
-                dbString += c.getString(c.getColumnIndex(COLUMN_STARTLAT));
+                dbString += ", ";
+                dbString += c.getString(c.getColumnIndex(COLUMN_DESCRIPTION));
+                dbString += ", ";
+                dbString += c.getString(c.getColumnIndex(COLUMN_DAY));
+                dbString += "/";
+                dbString += c.getString(c.getColumnIndex(COLUMN_MONTH));
+                dbString += "/";
+                dbString += c.getString(c.getColumnIndex(COLUMN_YEAR));
+                dbString += ", ";
+                dbString += c.getString(c.getColumnIndex(COLUMN_MINUTE));
+                dbString += ":";
+                dbString += c.getString(c.getColumnIndex(COLUMN_HOUR));
                 dbString += "\n";
             }
             c.moveToNext();

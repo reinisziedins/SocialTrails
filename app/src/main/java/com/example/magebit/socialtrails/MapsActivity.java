@@ -4,12 +4,15 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.icu.util.Calendar;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -48,7 +51,7 @@ import static com.example.magebit.socialtrails.R.id.wide;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    private static GoogleMap mMap;
+    static GoogleMap mMap;
     LocationManager locationManager;
     ArrayList markerPoints = new ArrayList();
     TextView _outputRoute;
@@ -58,10 +61,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     static Double startMarkerLng;
     static Double finishMarkerLat;
     static Double finishMarkerLng;
+    static int currentD, currentM, currentY;
     static boolean isRoute;
     boolean isPlacing;
 
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,18 +75,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(map);
         mapFragment.getMapAsync(this);
-
+        final Calendar cal = Calendar.getInstance();
+        currentY = cal.get(Calendar.YEAR);
+        currentM = cal.get(Calendar.MONTH) + 1;
+        currentD = cal.get(Calendar.DAY_OF_MONTH);
         _outputRoute = (TextView) findViewById(R.id.outputRouteField);
         dbHandler = new DBHandler(this, null, null, 1);
 
 
-
-
-
-
     }
-
-
 
 
     /**
@@ -90,12 +92,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.clear();
         printDatabase();
-      /*  LatLng Riga = new LatLng(56, 24);
-        mMap.addMarker(new MarkerOptions().position(Riga).title("Ziediņa markers"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(Riga));*/
+        FiletMenuActivity.filterParameter = 0;
 
-
+        //Camera move for demostraction , Note to self: remove when location request is fixed
+        LatLng Riga = new LatLng(56, 24);
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(Riga));
 
         //Set current location marker
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -194,7 +197,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     //Clearing markers
                     if (markerPoints.size() > 1) {
                         markerPoints.clear();
-                       // mMap.clear();
+                        // mMap.clear();
                     }
 
                     markerPoints.add(latLng);
@@ -211,7 +214,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         finishMarkerLat = latLng.latitude;
                         finishMarkerLng = latLng.longitude;
                         isRoute = true;
-                        Button button =(Button)findViewById(R.id.addMenu);
+                        Button button = (Button) findViewById(R.id.addMenu);
                         button.setVisibility(View.VISIBLE);
 
 
@@ -239,29 +242,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.getUiSettings().setZoomControlsEnabled(true);
 
 
-
         //Adding show current location functionality
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
         }
 
 
-
-
     }
+
     //Add route to database
     public void _addRoute(View view) {
         if (isRoute) {
-            Route route = new Route(_inputRoute.getText().toString(), startMarkerLat, startMarkerLng, finishMarkerLat, finishMarkerLng, null, 0, 0, 0, 0, 0);
+            Route route = new Route(0, _inputRoute.getText().toString(), startMarkerLat, startMarkerLng, finishMarkerLat, finishMarkerLng, null, 0, 0, 0, 0, 0);
             dbHandler.addRoute(route);
             _createTrail(view);
             printDatabase();
 
         }
     }
+
     //Enter/Cancel create a trail mode
     public void _createTrail(View view) {
-        Button createTrailButton = (Button)findViewById(R.id.createTrailButton);
+        Button createTrailButton = (Button) findViewById(R.id.createTrailButton);
         if (isPlacing) {
             isPlacing = false;
             createTrailButton.setText("Create Trail");
@@ -270,54 +272,61 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
              /*   mMap.clear();*/
             }
 
-        }
-        else  {
+        } else {
             isPlacing = true;
             createTrailButton.setText("Cancel");
         }
 
     }
 
+
     //Outputs all routes on map
-    public static void printDatabase() {
+    public void printDatabase() {
         String dbString = dbHandler.databaseToString();
-        double[] latListStart = dbHandler.getLatStart();
-        double[] lngListStart = dbHandler.getLngStart();
-        double[] latListFinish = dbHandler.getLatFinish();
-        double[] lngListFinish = dbHandler.getLngFinish();
-        int i = dbHandler.getIterator() - 1;
-        int j = 0;
-        while (i >= 0) {
-            LatLng origin = new LatLng(latListStart[j], lngListStart[j]);
-            LatLng dest = new LatLng(latListFinish[j], lngListFinish[j]);
-
+        int parameter = FiletMenuActivity.filterParameter;
+        Object[] list = dbHandler.getRoute(parameter);
+        for (Object route : list) {
+            LatLng origin = new LatLng(((Route) route).get_startLat(), ((Route) route).get_startLng());
+            LatLng dest = new LatLng(((Route) route).get_finishLat(), ((Route) route).get_finishLng());
             String url = getDirectionsUrl(origin, dest);
+            MarkerOptions start = new MarkerOptions();
+            MarkerOptions finish = new MarkerOptions();
 
+            start.position(origin);
+            finish.position(dest);
+            start.icon(BitmapDescriptorFactory.fromResource(R.drawable.start));
+            start.title(((Route) route).get_name()+ " start " +
+                    ((Route) route).getDay_x()+ "/" +
+                    ((Route) route).getMonth_x() + " " +
+                    ((Route) route).getMinute_x() + ":" +
+                    ((Route) route).getHour_x()
+            );
+            finish.title(((Route) route).get_name()+ " finish");
+            finish.icon(BitmapDescriptorFactory.fromResource(R.drawable.flag));
+            mMap.addMarker(start);
+            mMap.addMarker(finish);
             DownloadTask downloadTask = new DownloadTask();
 
             downloadTask.execute(url);
-            j++;
-            i--;
         }
-    /*    if (dbString != null) {
-            _outputRoute.setText(Arrays.toString(latListStart));
-            _inputRoute.setText("");
-
-        }*/
     }
+
     // Move to add menu activity
     public void addMenu(View v) {
-            startActivity(new Intent(MapsActivity.this, AddRouteActivity.class));
+        startActivity(new Intent(MapsActivity.this, AddRouteActivity.class));
     }
+
     //Move to Route list activity
     public void RouteListView(View v) {
         startActivity(new Intent(MapsActivity.this, RouteListActivity.class));
     }
+
     //Move to filter menu activity
-    public void FilterMenu(View v) {
+    public void filterMenu(View v) {
         startActivity(new Intent(MapsActivity.this, FiletMenuActivity.class));
     }
-    private static class DownloadTask extends AsyncTask<String, Void, String> {
+
+    private class DownloadTask extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... url) {
@@ -345,8 +354,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-
-    private static class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
 
 
         @Override
@@ -384,17 +392,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     double lat = Double.parseDouble(point.get("lat"));
                     double lng = Double.parseDouble(point.get("lng"));
                     LatLng position = new LatLng(lat, lng);
-                    if (j == 0 || j == (path.size() - 1)){
+                    //Adding custom markers from start to finish
+                /*    if (j == 0 || j == (path.size() - 1)) {
                         MarkerOptions options = new MarkerOptions();
                         options.position(position);
-                        if (j == 0 ) {
+                        if (j == 0) {
                             options.icon(BitmapDescriptorFactory.fromResource(R.drawable.start));
-                        }
-                        else {
+                        } else {
                             options.icon(BitmapDescriptorFactory.fromResource(R.drawable.flag));
                         }
                         mMap.addMarker(options);
-                    }
+                    }*/
                     points.add(position);
                 }
 
@@ -410,12 +418,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
 
-        // Drawing polyline(route)
+            // Drawing polyline(route)
             mMap.addPolyline(lineOptions);
         }
     }
 
-    private static String getDirectionsUrl(LatLng origin, LatLng dest) {
+    private String getDirectionsUrl(LatLng origin, LatLng dest) {
 
         // Origin of route
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
@@ -442,7 +450,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     /**
      * A method to download json data from url
      */
-    private static String downloadUrl(String strUrl) throws IOException {
+    private String downloadUrl(String strUrl) throws IOException {
         String data = "";
         InputStream iStream = null;
         HttpURLConnection urlConnection = null;

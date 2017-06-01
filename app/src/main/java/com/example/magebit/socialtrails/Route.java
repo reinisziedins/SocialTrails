@@ -20,7 +20,8 @@ public class Route {
 
     }
 
-    public Route(String _name, Double _startLat, Double _startLng, Double _finishLat, Double _finishLng, String _description, int minute_x, int hour_x, int day_x, int month_x, int year_x) {
+    public Route(int _id, String _name, Double _startLat, Double _startLng, Double _finishLat, Double _finishLng, String _description, int minute_x, int hour_x, int day_x, int month_x, int year_x) {
+        this._id = 0;
         this._name = _name;
         this._startLat = _startLat;
         this._startLng = _startLng;

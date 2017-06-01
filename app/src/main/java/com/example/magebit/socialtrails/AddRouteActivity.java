@@ -19,23 +19,21 @@ import android.widget.Toast;
 
 public class AddRouteActivity extends AppCompatActivity {
     Button dateButton, timeButton;
-    int year_x,month_x,day_x,hour_x,minute_x, currentY, currentM, currentD;
+    int year_x,month_x,day_x,hour_x,minute_x;
+    static int currentY, currentM, currentD;
     static final int DATEDILOG_ID = 0;
     static final int TIMEDILOG_ID = 1;
     DBHandler dbHandler;
     EditText routeName;
     EditText routeDescription;
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_route);
-
-        final Calendar cal = Calendar.getInstance();
-        year_x = currentY = cal.get(Calendar.YEAR);
-        month_x = currentM = cal.get(Calendar.MONTH);
-        day_x = currentD = cal.get(Calendar.DAY_OF_MONTH);
+        year_x = currentY = MapsActivity.currentY;
+        month_x = currentM = MapsActivity.currentM;
+        day_x = currentD = MapsActivity.currentD;
         showDialogOnClick();
         routeName = (EditText) findViewById(R.id.RouteName);
         routeDescription = (EditText) findViewById(R.id.RouteDescription);
@@ -82,7 +80,7 @@ public class AddRouteActivity extends AppCompatActivity {
             }
             else {
                 year_x = year;
-                month_x = month + 1;
+                month_x = month;
                 day_x = dayOfMonth;
                 Toast.makeText(AddRouteActivity.this, year_x + "/" + month_x + "/" + day_x, Toast.LENGTH_LONG).show();
             }
@@ -99,7 +97,7 @@ public class AddRouteActivity extends AppCompatActivity {
     };
     public void addRoute(View view) {
         if (MapsActivity.isRoute) {
-            Route route = new Route(routeName.getText().toString(),
+            Route route = new Route(0, routeName.getText().toString(),
                     MapsActivity.startMarkerLat,
                     MapsActivity.startMarkerLng,
                     MapsActivity.finishMarkerLat,
