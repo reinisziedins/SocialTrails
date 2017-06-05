@@ -130,4 +130,16 @@ public class Route {
     public void setYear_x(int year_x) {
         this.year_x = year_x;
     }
+
+    @Override
+    public String toString() {
+        return this._name + ", " +
+                this._description + ", " +
+                this.day_x  + "/" +
+                this.month_x + "/" +
+                this.year_x + ", " +
+                this.hour_x + ":" +
+                this.minute_x + ";"
+                ;
+    }
 }

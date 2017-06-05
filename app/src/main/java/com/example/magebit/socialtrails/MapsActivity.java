@@ -80,7 +80,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         currentY = cal.get(Calendar.YEAR);
         currentM = cal.get(Calendar.MONTH) + 1;
         currentD = cal.get(Calendar.DAY_OF_MONTH);
-        _outputRoute = (TextView) findViewById(R.id.outputRouteField);
         dbHandler = new DBHandler(this, null, null, 1);
 
 
@@ -301,8 +300,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             start.title(((Route) route).get_name()+ " start " +
                     ((Route) route).getDay_x()+ "/" +
                     ((Route) route).getMonth_x() + " " +
-                    ((Route) route).getMinute_x() + ":" +
-                    ((Route) route).getHour_x()
+                    ((Route) route).getHour_x() + ":" +
+                    ((Route) route).getMinute_x()
             );
             finish.title(((Route) route).get_name()+ " finish");
             finish.icon(BitmapDescriptorFactory.fromResource(R.drawable.flag));
@@ -313,7 +312,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             downloadTask.execute(url);
         }
     }
-
+    //Velo automašīna
+    //Datu modelis, d
+    //Crud
+    //Distance
+    //Laiks ceļā
     // Move to add menu activity
     public void addMenu(View v) {
         startActivity(new Intent(MapsActivity.this, AddRouteActivity.class));

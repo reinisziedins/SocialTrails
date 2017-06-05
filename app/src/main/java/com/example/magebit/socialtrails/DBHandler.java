@@ -23,6 +23,13 @@ public class DBHandler extends SQLiteOpenHelper {
     public static final String COLUMN_DAY = "day";
     public static final String COLUMN_MONTH = "month";
     public static final String COLUMN_YEAR = "year";
+    public static final String TABLE_TAGS = "tags";
+    public static final String COLUMN_TAGID = "tagid";
+    public static final String TABLE_ROUTETAG = "routetag";
+    public static final String COULUMN_ROUTETAGID = "routetagid";
+    public static final String COULUMN_ROUTETAGID = "routetagid";
+    public static final String COULUMN_CROW = "routetagcrow";
+
 
 
     public DBHandler(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -45,6 +52,9 @@ public class DBHandler extends SQLiteOpenHelper {
                 COLUMN_DAY + " INT," +
                 COLUMN_MONTH + " INT," +
                 COLUMN_YEAR + " INT" +
+                ");" +
+                "CREATE TABLE " + TABLE_TAGS  +  "(" +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 ");";
         db.execSQL(query);
     }
@@ -74,10 +84,22 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
 
     }
-    public void  deleteRoute(String routeName) {
+    public void  deleteRoute(String routeId) {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("DELETE FROM " + TABLE_ROUTES + " WHERE " + COLUMN_ROUTENAME + "=\"" + routeName + "\";");
+        db.execSQL("DELETE FROM " + TABLE_ROUTES + " WHERE " + COLUMN_ID + " = " + routeId + ";");
 
+    }
+    public void editRoute(Route route) {
+        SQLiteDatabase db = getWritableDatabase();
+        String routeId = String.valueOf(route.get_id());
+        db.execSQL("UPDATE " + TABLE_ROUTES + " SET " +
+                COLUMN_DESCRIPTION + " = '" + route.get_description() + "' , " +
+                COLUMN_ROUTENAME + " = '" + route.get_name() + "' , " +
+                COLUMN_MINUTE + " = " + route.getMinute_x() + " , " +
+                COLUMN_HOUR + " = " + route.getHour_x() + " , " +
+                COLUMN_DAY + " = " + route.getDay_x() + " , " +
+                COLUMN_MONTH + " = " + route.getMonth_x() + " , " +
+                COLUMN_YEAR + " = " + route.getYear_x() + " WHERE " + COLUMN_ID + " = " + routeId);
     }
 
     //Gets trails
@@ -144,9 +166,9 @@ public class DBHandler extends SQLiteOpenHelper {
                 COLUMN_YEAR + ", "  +
                 COLUMN_MONTH + ", " +
                 COLUMN_DAY + ", " +
-                COLUMN_HOUR + ", " +
-                COLUMN_MINUTE  +
-                " ASC";
+                COLUMN_MINUTE + ", " +
+                COLUMN_HOUR +
+        " ASC";
 
         Cursor c = db.rawQuery(query, null);
 
@@ -166,9 +188,9 @@ public class DBHandler extends SQLiteOpenHelper {
                 dbString += "/";
                 dbString += c.getString(c.getColumnIndex(COLUMN_YEAR));
                 dbString += ", ";
-                dbString += c.getString(c.getColumnIndex(COLUMN_MINUTE));
-                dbString += ":";
                 dbString += c.getString(c.getColumnIndex(COLUMN_HOUR));
+                dbString += ":";
+                dbString += c.getString(c.getColumnIndex(COLUMN_MINUTE));
                 dbString += "\n";
             }
             c.moveToNext();
