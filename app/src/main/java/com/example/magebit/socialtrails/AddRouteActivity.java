@@ -30,6 +30,7 @@ public class AddRouteActivity extends AppCompatActivity {
     static int editRouteId = 0;
     DBHandler dbHandler;
     EditText routeName;
+    EditText tagName;
     EditText routeDescription;
 
     @Override
@@ -41,6 +42,7 @@ public class AddRouteActivity extends AppCompatActivity {
         day_x = currentD = MapsActivity.currentD;
         showDialogOnClick();
         routeName = (EditText) findViewById(R.id.RouteName);
+        tagName = (EditText) findViewById(R.id.RouteTag);
         routeDescription = (EditText) findViewById(R.id.RouteDescription);
         dbHandler = MapsActivity.dbHandler;
         if (editRouteId != 0) {
@@ -131,8 +133,10 @@ public class AddRouteActivity extends AppCompatActivity {
                 month_x,
                 year_x
         );
+        Tag tag = new Tag(0, tagName.getText().toString());
         if (editRouteId == 0 && MapsActivity.isRoute) {
-            dbHandler.addRoute(route);
+            int tagId = dbHandler.addTag(tag);
+            dbHandler.addRoute(route, tagId);
             Toast.makeText(AddRouteActivity.this, "Route " + routeName.getText().toString() + " added", Toast.LENGTH_LONG).show();
         } else {
             route.set_id(editRouteId);

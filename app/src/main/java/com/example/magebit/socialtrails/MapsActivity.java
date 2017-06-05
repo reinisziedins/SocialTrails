@@ -64,6 +64,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     static Double finishMarkerLng;
     static int currentD, currentM, currentY;
     static boolean isRoute;
+    static String filterTagId = "";
     boolean isPlacing;
 
 
@@ -252,7 +253,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    //Add route to database
+/*    //Add route to database
     public void _addRoute(View view) {
         if (isRoute) {
             Route route = new Route(0, _inputRoute.getText().toString(), startMarkerLat, startMarkerLng, finishMarkerLat, finishMarkerLng, null, 0, 0, 0, 0, 0);
@@ -261,7 +262,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             printDatabase();
 
         }
-    }
+    }*/
 
     //Enter/Cancel create a trail mode
     public void _createTrail(View view) {
@@ -286,7 +287,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void printDatabase() {
         String dbString = dbHandler.databaseToString();
         int parameter = FiletMenuActivity.filterParameter;
-        Object[] list = dbHandler.getRoute(parameter);
+        Object[] list;
+        if(filterTagId == "") {
+            list = dbHandler.getRoute(parameter);
+        }
+        else {
+            list = dbHandler.getTagRoutes(filterTagId);
+        }
         for (Object route : list) {
             LatLng origin = new LatLng(((Route) route).get_startLat(), ((Route) route).get_startLng());
             LatLng dest = new LatLng(((Route) route).get_finishLat(), ((Route) route).get_finishLng());
@@ -311,6 +318,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             downloadTask.execute(url);
         }
+        filterTagId = "";
     }
     //Velo automašīna
     //Datu modelis, d
@@ -325,6 +333,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //Move to Route list activity
     public void RouteListView(View v) {
         startActivity(new Intent(MapsActivity.this, RouteListActivity.class));
+    }
+    public void TagListView(View v) {
+        startActivity(new Intent(MapsActivity.this, TagListActivity.class));
     }
 
     //Move to filter menu activity
